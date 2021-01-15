@@ -7,5 +7,32 @@
 </head>
 <body>
     Hello, {{ username }} <a href="{% url 'logout' %}">Logout</a>
+    <br><br>
+    {% if fixedExpenses %}
+        <table>       
+            <thead>
+                <th>Fixed Expenses:</th>
+            </thead>
+            <tbody>
+                {% for expense in fixedExpenses %}
+                    <tr><td>{{ expense }}</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+
+    {% if variableExpenses %}
+        <table>
+            <thead>
+                <th>Variable Expenses:</th>
+            </thead>
+            <tbody>
+                {% for expense in variableExpenses %}
+                    <tr><td>{{ expense }}</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
 </body>
 </html>

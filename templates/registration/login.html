@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="{% static 'webapp/home.css' %}">
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="{% static 'webapp/login.js' %}"></script>
 
     <title>Login</title>
 </head>
@@ -33,7 +34,11 @@
                                 </div>
                                 <div class="form-group">
                                     <label for="password" class="text-info">Password:</label><br>
-                                    <input type="text" name="password" id="password" class="form-control">
+                                    <div style="flex-wrap: wrap;">
+                                    <input type="password" name="password" id="password" class="form-control">
+                                    <img id="lock" src="{% static 'webapp/eyeOpen.svg' %}" alt="Eye" width=24px data-status="closed" >
+                                    
+                                    </div>
                                 </div>
                                 <div class="form-group">
                                     <br>

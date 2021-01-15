@@ -1,0 +1,43 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Expense</title>
+    <script src="{% static 'webapp/addExpense.js' %}"></script>
+</head>
+<body>
+
+    <H1>New Expense:</H1>
+    <form action="{% url 'addExpenseHandler' %}" method="post">
+        {% csrf_token %}
+        <label for="expenseType">Expense type:</label>
+        <select id="expenseType" name="expenseType">
+            <option disabled selected value> -- select an option -- </option>
+            <option value="variable">Variable</option>
+            <option value="fixed">Fixed</option>
+        </select>
+
+        <br><br>
+
+        <label for="title">Title: </label>
+        <input name="title" type="text" placeholder="Your's expense title">
+
+        <br><br>
+
+        <label for="value">Value: </label>
+        <input name="value" type="text" placeholder="Your's expense value">
+
+        <br><br>
+         
+        <div id="specificForm"></div>
+
+        <br><br>
+        <input type="submit">
+        
+    </form>
+    
+</body>
+</html>
