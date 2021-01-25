@@ -17,8 +17,8 @@ def register(request):
     return HttpResponse("<h1>Registration not working yet :(</h1>")
 
 def home(request):
-    fixedExpenses = models.FixedExpense.objects.filter(ownear=request.user)
-    variableExpenses = models.VariableExpense.objects.filter(ownear=request.user)
+    fixedExpenses = models.FixedExpense.objects.filter(owner=request.user)
+    variableExpenses = models.VariableExpense.objects.filter(owner=request.user)
     
     # print(fixedExpenses.first())
     if not request.user.is_authenticated:
@@ -41,7 +41,7 @@ def addExpenseHandler(request):
 
     if form["expenseType"] == "fixed":
         #Create FixedExpense object
-        expense = models.FixedExpense(title=form["title"], value=form["value"], paymentDay=form["paymentDay"], description=form["description"], ownear=request.user)
+        expense = models.FixedExpense(title=form["title"], value=form["value"], paymentDay=form["paymentDay"], description=form["description"], owner=request.user)
         expense.save()
 
         #Adds expense on alarms
@@ -49,7 +49,7 @@ def addExpenseHandler(request):
         eventObj.save()       
 
     elif form["expenseType"] == "variable":
-        expense = models.VariableExpense(title=form["title"], value=form["value"], categorie=form["categorie"], ownear=request.user)
+        expense = models.VariableExpense(title=form["title"], value=form["value"], categorie=form["categorie"], owner=request.user)
         expense.save()
 
     return HttpResponse("Expense created")

@@ -6,4 +6,4 @@ from webapp import models
 
 admin.site.register(models.FixedExpense)
 admin.site.register(models.VariableExpense)
-admin.site.register(models.EmailEvents)
+admin.site.register(models.NotificationEvents)

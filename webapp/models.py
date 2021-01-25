@@ -1,27 +1,22 @@
+import os
 
 from django.db import models
 from django.contrib.auth.models import User
+from twilio.rest import Client
+from django.core.mail import send_mail
 
 # Create your models here.
-
-class EmailEvents(models.Model):
-    name = models.CharField(max_length=64)
-    email = models.CharField(max_length=64)
-    date = models.IntegerField()
-
-
-
 class FixedExpense(models.Model):
     title = models.CharField(max_length=64)
     value = models.FloatField()
     paymentDay = models.IntegerField()
     description = models.TextField()
-    ownear = models.ForeignKey(User, on_delete=models.CASCADE)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE)
 
     def __str__(self):
-        return f"{self.title} - R${self.value} - every {self.paymentDay} by {self.ownear.username}"
+        return f"{self.title} - R${self.value} - every {self.paymentDay} by {self.owner.username}"
 
-
+#----------------------------------------------------------------
 class VariableExpense(models.Model):
     categories = [
         "Food",
@@ -38,12 +33,47 @@ class VariableExpense(models.Model):
     title = models.CharField(max_length=64)
     value = models.FloatField()
     categorie = models.CharField(max_length=64)
-    ownear = models.ForeignKey(User, on_delete=models.CASCADE)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE)
 
     def __str__(self):
-        return f"{self.title} - R${self.value} - categorie = {self.categorie} by {self.ownear.username}"
+        return f"{self.title} - R${self.value} - categorie = {self.categorie} by {self.owner.username}"
 
+#----------------------------------------------------------------
+class NotificationEvents(models.Model):
+    expense = models.ForeignKey(FixedExpense, on_delete=models.CASCADE)
+    email = models.CharField(max_length=64, default=None)
+    phoneNumber = models.CharField(max_length=64, default=None)
+    wasSent = models.BooleanField(default=False)
 
+    def __str__(self):
+        return f"SMS - to {self.phoneNumber} about {self.expense}"
 
+    def sendSMS(self):
+        if self.phoneNumber != None:
+            account_sid = os.environ['TWILIO_ACCOUNT_SID']
+            auth_token = os.environ['TWILIO_AUTH_TOKEN']
+            client = Client(account_sid, auth_token)
+
+            message = client.messages.create(
+                                        body = f'{self.expense.owner.username}, today is payment day for "{self.expense.title}" on total value of {self.expense.value}',
+                                        from_ = os.environ['TWILIO_PHONE_NUMBER'],
+                                        to = self.phoneNumber
+                                    )
+            print(f"Sms {message.sid} to {self.expense.owner.username} is sent!")
+        else:
+            print("Event does not have a phoneNumber attached, skiping sendSMS...")
+
+    def sendEMAIL(self):
+        if self.email != None:
+            send_mail(
+            f"Payment day for {self.expense.title}!", #subject
+            f'{self.expense.owner.username}, today is payment day for "{self.expense.title}" on total value of {self.expense.value}', #body
+            'brunovilardibueno@gmail.com', #from
+            [self.email], #to
+            fail_silently=False,
+            )
+            print(f"email to {self.expense.owner.username} is sent!")
+        else:
+            print("Event does not have a email attached, skiping sendEMAIL...")
 
 
