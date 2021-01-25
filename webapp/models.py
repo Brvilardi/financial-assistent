@@ -12,6 +12,7 @@ class FixedExpense(models.Model):
     paymentDay = models.IntegerField()
     description = models.TextField()
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    duration = models.IntegerField(default=-1) #-1== forever
 
     def __str__(self):
         return f"{self.title} - R${self.value} - every {self.paymentDay} by {self.owner.username}"
@@ -34,6 +35,7 @@ class VariableExpense(models.Model):
     value = models.FloatField()
     categorie = models.CharField(max_length=64)
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    date = models.DateField(auto_now_add=True, null=True)
 
     def __str__(self):
         return f"{self.title} - R${self.value} - categorie = {self.categorie} by {self.owner.username}"
@@ -41,9 +43,9 @@ class VariableExpense(models.Model):
 #----------------------------------------------------------------
 class NotificationEvents(models.Model):
     expense = models.ForeignKey(FixedExpense, on_delete=models.CASCADE)
-    email = models.CharField(max_length=64, default=None)
-    phoneNumber = models.CharField(max_length=64, default=None)
-    wasSent = models.BooleanField(default=False)
+    email = models.CharField(max_length=64, default=None, null = True)
+    phoneNumber = models.CharField(max_length=64, default=None, null = True)
+    wasSent = models.BooleanField(default=False, null = True)
 
     def __str__(self):
         return f"SMS - to {self.phoneNumber} about {self.expense}"

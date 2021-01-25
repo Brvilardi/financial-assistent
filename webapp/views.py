@@ -41,11 +41,12 @@ def addExpenseHandler(request):
 
     if form["expenseType"] == "fixed":
         #Create FixedExpense object
-        expense = models.FixedExpense(title=form["title"], value=form["value"], paymentDay=form["paymentDay"], description=form["description"], owner=request.user)
+        print("duration: ", form["duration"])
+        expense = models.FixedExpense(title=form["title"], value=form["value"], paymentDay=form["paymentDay"], description=form["description"], owner=request.user, duration=int(form['duration']))
         expense.save()
 
         #Adds expense on alarms
-        eventObj = models.EmailEvents(name=request.user.username, email=request.user.email, date=form["paymentDay"] )
+        eventObj = models.NotificationEvents(expense=expense, email=request.user.email)
         eventObj.save()       
 
     elif form["expenseType"] == "variable":

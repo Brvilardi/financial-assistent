@@ -8,7 +8,15 @@ let fixedForm = `
     <br><br>
 
     <label for="description">description: </label>
-    <textarea name="description" form="form_id" placeholder="Your's expense description"></textarea>
+    <textarea name="description" placeholder="Your's expense description"></textarea>
+
+    <br><br>
+
+    <label for="duration">Duration in months:</label>
+    <input type="number" id="duration" name="duration" min="1">
+
+    <input type="checkbox" id="durationForever" name="duration" value="-1">
+    <label for="duration"> Forever</label><br>
 `;
 
 //categorie 
@@ -23,6 +31,23 @@ var expenseForm = {
     "variable": variableForm
 };
 
+function checkboxIteration(){
+    var durationInput = document.getElementById("duration");
+    var durationForever = document.getElementById("durationForever");
+    durationForever.addEventListener('change', function(){
+    
+        if (this.checked){
+            durationInput.disabled = true;
+            durationInput.setAttribute("type", "hidden");
+        }
+        else{
+            durationInput.disabled = false;
+            durationInput.setAttribute("type", "number");
+
+        }
+    });
+}
+
 
 document.addEventListener('DOMContentLoaded', function() {
     var type = document.getElementById("expenseType");
@@ -31,9 +56,15 @@ document.addEventListener('DOMContentLoaded', function() {
     if (type.value === "variable" || type.value === "fixed"){
         form.innerHTML = expenseForm[type.value];
     } 
+    
 
     type.addEventListener('change', function(){       
         form.innerHTML = expenseForm[type.value];   
+        if (type.value === "fixed"){
+            console.log("entrou")
+            checkboxIteration();  
+
+        }
     })
 
 })
