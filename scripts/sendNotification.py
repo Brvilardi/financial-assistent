@@ -12,6 +12,12 @@ django.setup()
 from webapp import models
 from django.contrib.auth.models import User
 
+def sendNotifications(event, newStatus):
+    event.sendSMS()             #Sends a SMS if event has phone number
+    event.sendEMAIL()           #sends an email if event has email 
+    event.wasSent = newStatus   #updates the status of that event
+    event.save()
+
 def run():
     print("sendNotifcation script starting...")
     #Gets the current day
@@ -28,7 +34,9 @@ def run():
                 event.save()
                 count += 1
             else:
-                print(f"Warning! event {event} was not sent yesterday!!")
+                print(f"Warning! event {event} was not sent yesterday!!\nSending notification for that event...\n")
+                #sendNotifications(event, False) #activate only if you can garante that run() will run only once a day
+                
     print(f"Total {count} of events updated! - events from paymentDay = {curDay -1}")
     
 
@@ -39,9 +47,6 @@ def run():
         for event in todayEvents:
             # print(f"event: {event} // wasSent: {event.wasSent}")
             if not event.wasSent:
-                event.sendSMS()
-                event.sendEMAIL()
-                event.wasSent = True
-                event.save()
+                sendNotifications(event, True)
                 count +=1
     print(f"total {count} events sent and updated! - events from paymentDay = {curDay}")
