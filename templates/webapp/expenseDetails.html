@@ -1,0 +1,52 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense details</title>
+
+    <script src="{% static 'webapp/expenseDetails.js' %}"></script>
+</head>
+<body>
+
+    {% if data %}
+        <form action="{% url 'expenseDetailsHandler' %}" method="post">
+            {% csrf_token %}
+            <!-- invisible inputs -->
+            {% for field in hiddenData %}
+                <input name="{{ field.0 }}" type="text" value="{{ field.1 }}" hidden>
+                
+            {% endfor %}       
+
+
+            <!-- visible inputs -->
+            {% for field in data %}
+
+                {% if field.0 != 'duration' %} 
+                    <label for="{{ field.0 }}">{{ field.0 }}: </label>
+                    <input name="{{ field.0 }}" type="text" placeholder="{{ field.1 }}" value="{{ field.1 }}">
+
+                {% else %}
+                    <label for="duration">Duration in months:</label>
+                    {% if field.1 == -1 %}
+                        <input type="number" id="duration" name="duration" min="1" hidden>
+                        <input type="checkbox" id="durationForever" name="duration" value="-1" checked>
+                        <label for="duration"> Forever</label><br>
+                    {% else %}
+                        <input type="number" id="duration" name="duration" min="1" value="{{ field.1 }}">
+                        <input type="checkbox" id="durationForever" name="duration" value="-1">
+                        <label for="duration"> Forever</label><br>
+                    {% endif %}
+
+                {% endif %}
+                <br><br>
+            {% endfor %}
+            <label for="delete">Delete this expense?</label>
+            <input type="checkbox" name="delete" id="delete">
+            <br><br>
+            <input type="submit">      
+        </form>
+    {% endif %}
+</body>
+</html>

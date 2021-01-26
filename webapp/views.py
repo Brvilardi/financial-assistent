@@ -29,6 +29,98 @@ def home(request):
                                                 "variableExpenses": variableExpenses})
 
 
+def expenseDetails(request, expenseType, expenseId):
+    """
+        Shows details of specific expense
+    """
+
+    #Gets the expense
+    if expenseType == 'fixed':
+        expense = models.FixedExpense.objects.all().filter(id=expenseId).first()
+    elif expenseType == 'variable':
+        expense = models.VariableExpense.objects.all().filter(id=expenseId).first()
+    else:
+        return HttpResponse("expense not found")
+
+    #Checks if user is has access to that expense
+    if request.user.id != expense.owner.id:
+        return HttpResponse("You don't have privileges")
+
+    #Loads expense data to dictionary
+    content = expense.__dict__
+    del content['_state']
+    del content['owner_id']
+    del content['id']
+    
+    #Loads invisible info
+    hiddenContent = {
+        'expenseType': expenseType,
+        'expenseId': expenseId
+        
+    }
+
+    #Render page with editable fields for that object
+    return render(request, "webapp/expenseDetails.html", {'data': content.items(),
+                                                          'hiddenData': hiddenContent.items()})
+
+
+    print(content)
+    
+def expenseDetailsHandler(request):
+    """
+    Handle the expenseDetails POST, for editing expenses
+    """
+    #ADD VERIFICATIONS HERE!!!!!!!!!!!!!!!!!!!!!
+
+
+    #Verifies if user wants to delete
+    try: 
+        delete = request.POST['delete'] != None
+    except:
+        delete = False   
+    
+    #Gets general expense info
+    expenseType = request.POST['expenseType']
+    expenseId = request.POST['expenseId']
+
+    #Deletes object if user wants to
+    
+
+    #Gets specific expense info and updates or deletes on db
+    if expenseType == 'fixed':
+        expense = models.FixedExpense.objects.filter(id=expenseId).first()
+        if delete:
+            expense.delete()
+            return HttpResponse(f"Deleted")
+
+        expense.title = request.POST['title']
+        expense.value = request.POST['value']
+        expense.paymentDay = request.POST['paymentDay']
+        expense.description = request.POST['description']
+        expense.duration = request.POST['duration']
+
+
+        expense.save()
+
+    elif expenseType == 'variable':
+        expense = models.VariableExpense.objects.filter(id=expenseId).first()
+        if delete:
+            expense.delete()
+            return HttpResponse(f"Deleted")
+
+
+        expense.title = request.POST['title']
+        expense.value = request.POST['value']
+        expense.categorie = request.POST['categorie']
+        expense.date = request.POST['date']
+
+        expense.save()      
+
+    return HttpResponse(f'Success!! "{expense.title}" updated!')
+    
+
+
+
 def addExpense(request):
     return render(request, "webapp/addExpense.html", {"username": request.user.username})
 
