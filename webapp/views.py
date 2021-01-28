@@ -4,6 +4,9 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from webapp import models
 from datetime import date
+from dateutil.relativedelta import *
+import pprint
+import json
 
 
 #Useful functions
@@ -15,6 +18,60 @@ def checkIfAuth(request):
             return redirect("home")
     except Exception:
         print(f"something went wrong\nuser: {request.user}")
+
+def jsonfy(target):
+    newObject = target.__dict__
+    print("NEW: ", newObject)          
+    try:
+        del newObject['_state']
+    except Exception:
+        pass
+    try:
+        del newObject['begining']
+    except Exception:
+        pass
+    try:
+        del newObject['date']
+    except Exception:
+        pass
+    
+    return newObject
+
+def cleanFixedExpenses(fixedExpenses):
+    """"
+    Returns a dictionary with all fixed expenses from 0 - Jan to 11 - Dec
+    """
+    today = date.today()
+    cleanFixedExpenses = {0:[],1:[],2:[],3:[],4:[],5:[],6:[],7:[],8:[],9:[],10:[],11:[]}
+    for expense in fixedExpenses:
+        #Checks if expense is forever
+        if expense.duration == -1:
+            month = expense.begining.month
+            while(month <= 11):
+                cleanFixedExpenses[month].append(jsonfy(expense))
+                month += 1
+
+        #populates the first month
+        elif expense.begining.year == today.year:
+            month = expense.begining.month
+            lastDate = expense.begining + relativedelta(months=+expense.duration)
+            while(month <= 11):
+                #Checks if expend exceed the duration
+                if today.replace(month=month) >= lastDate:
+                    break
+                #Adds the expense on that month
+                cleanFixedExpenses[month].append(jsonfy(expense))
+                month += 1
+    return cleanFixedExpenses
+
+def cleanVariableExpenses(variableExpenses):
+    """
+    Returns a dictionary with all variable expenses from 0 - Jan to 11 - Dec
+    """
+    cleanVariableExpenses = {0:[],1:[],2:[],3:[],4:[],5:[],6:[],7:[],8:[],9:[],10:[],11:[]}
+    for expense in variableExpenses:
+        cleanVariableExpenses[expense.date.month].append(jsonfy(expense))
+    return cleanVariableExpenses
 
 #-------------------------------------------------------------
 
@@ -33,14 +90,29 @@ def home(request):
     checkIfAuth(request)
 
     #Gets all expenses of the user
-    month = date.today().month
     fixedExpenses = models.FixedExpense.objects.filter(owner=request.user)
     variableExpenses = models.VariableExpense.objects.filter(owner=request.user)  
+
+    #Cleans fixedExpenses for not active expense
+    print("Fixed1:")
+    print(fixedExpenses)
+    cleanedFixedExpenses = cleanFixedExpenses(fixedExpenses.all())#The function is breaking the input, using .all() fixed
+    pprint.pprint(cleanedFixedExpenses)
+    print("Fixed2:")
+    print(fixedExpenses)
+
+    #Cleans variableExpenses for easy front end ingestion
+    cleanedVariableExpenses = cleanVariableExpenses(variableExpenses.all())#The function is breaking the input, using .all() fixed
+    pprint.pprint(cleanedVariableExpenses)
+
+
     
     #Render page with all expenses info
     return render(request, "webapp/home.html", {"username": request.user.username,
-                                                "fixedExpenses": list(fixedExpenses),
-                                                "variableExpenses": variableExpenses})
+                                                "fixedExpenses": fixedExpenses,
+                                                "variableExpenses": variableExpenses,
+                                                "cleanedFixedExpenses": json.dumps(cleanedFixedExpenses),
+                                                "cleanedVariableExpenses": json.dumps(cleanedVariableExpenses)})
 
 
 def expenseDetails(request, expenseType, expenseId):

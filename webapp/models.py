@@ -13,7 +13,8 @@ class FixedExpense(models.Model):
     description = models.TextField()
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
     duration = models.IntegerField(default=-1) #-1== forever
-    begining = models.DateTimeField(auto_now_add=True, null=True)
+    begining = models.DateField(auto_now_add=True, null=True)
+      
 
     def __str__(self):
         return f"{self.title} - {self.value} - {self.paymentDay} - {self.owner.username}"

@@ -11,13 +11,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js" integrity="sha512-d9xgZrVZpmmQlfonhQUvTR7lMPtO7NkZMkA0ABN3PHCbKA5nqylQ/yWlFAyY6hYgdF1Qh6nYiuADWwKB4C2WSw==" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="{% static 'webapp/home.css' %}">
 
-    <script>
-      var fixedExpensesRaw = "{{ fixedExpenses | safe  }}";
-      var variableExpensesRaw = "{{ variableExpenses | safe  }}";
-    
-    </script>
-
-    <script src="{% static 'webapp/home.js' %}"></script>
     <title>Home</title>
 </head>
 <body>
@@ -68,7 +61,76 @@
 <div id="graphContainer">
   <canvas id="myChart"></canvas>
 </div>
+<script>
 
+  function mapSum(array){
+   // console.log(array)
+    var newArray = [];
+    for(var i = 0; i<array.length; i++){
+      newArray[i] = 0;
+      //console.log("entrou");
+      if(array[i].length > 0){
+          for(var j=0; j<array[i].length; j++){
+            //console.log(newArray[i][j]);
+            newArray[i] += array[i][j].value;
+          }
+      }
+    };
+    return newArray;
+  }
+
+    var fixedExpenses = {{ cleanedFixedExpenses | safe }};
+    var variableExpenses = {{ cleanedVariableExpenses| safe }};
+
+    var cleanedFixedExpenses = mapSum(Object.values(fixedExpenses));
+    var cleanedVariableExpenses = mapSum(Object.values(variableExpenses))
+
+
+    var ctx = document.getElementById('myChart').getContext('2d');
+    var chart = new Chart(ctx, {
+        // The type of chart we want to create
+        type: 'bar',
+    
+        // The data for our dataset
+        data: {
+            labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+            datasets: [{
+                label: 'Fixed Expense',
+                backgroundColor: 'rgb(255, 99, 132)',
+                borderColor: 'rgb(255, 255, 255)',
+                data: cleanedFixedExpenses
+            },
+            {
+                label: 'Variable Expense',
+                backgroundColor: 'rgb(13, 109, 52)',
+                borderColor: 'rgb(255, 255, 255)',
+                data: cleanedVariableExpenses
+            }
+            
+
+        ]
+        },
+    
+        // Configuration options go here
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                xAxes: [{
+                  stacked: true,
+                }],
+                yAxes: [{
+                  stacked: true
+                }]
+              }
+        }
+    });
+    
+    chart.canvas.style.backgroundColor = 'rgba(255,255,255)';
+    
+    
+
+</script>
 <br><br>
 
 
