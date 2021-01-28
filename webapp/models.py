@@ -13,9 +13,10 @@ class FixedExpense(models.Model):
     description = models.TextField()
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
     duration = models.IntegerField(default=-1) #-1== forever
+    begining = models.DateTimeField(auto_now_add=True, null=True)
 
     def __str__(self):
-        return f"{self.title} - R${self.value} - every {self.paymentDay} by {self.owner.username}"
+        return f"{self.title} - {self.value} - {self.paymentDay} - {self.owner.username}"
 
 #----------------------------------------------------------------
 class VariableExpense(models.Model):
@@ -38,7 +39,7 @@ class VariableExpense(models.Model):
     date = models.DateField(auto_now_add=True, null=True)
 
     def __str__(self):
-        return f"{self.title} - R${self.value} - categorie = {self.categorie} by {self.owner.username}"
+        return f"{self.title} - {self.value} - {self.categorie} - {self.date} - {self.owner.username}"
 
 #----------------------------------------------------------------
 class NotificationEvents(models.Model):

@@ -3,8 +3,20 @@ import time
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from webapp import models
+from datetime import date
 
 
+#Useful functions
+def checkIfAuth(request):
+    try:
+        if not request.user.is_authenticated:
+            #To do: return error message
+            print("User is not auth")
+            return redirect("home")
+    except Exception:
+        print(f"something went wrong\nuser: {request.user}")
+
+#-------------------------------------------------------------
 
 # Create your views here.
 def index(request):
@@ -17,15 +29,17 @@ def register(request):
     return HttpResponse("<h1>Registration not working yet :(</h1>")
 
 def home(request):
+    #Verify if user is auth
+    checkIfAuth(request)
+
+    #Gets all expenses of the user
+    month = date.today().month
     fixedExpenses = models.FixedExpense.objects.filter(owner=request.user)
-    variableExpenses = models.VariableExpense.objects.filter(owner=request.user)
+    variableExpenses = models.VariableExpense.objects.filter(owner=request.user)  
     
-    # print(fixedExpenses.first())
-    if not request.user.is_authenticated:
-        print("User not authenticated")
-        return redirect("login")
+    #Render page with all expenses info
     return render(request, "webapp/home.html", {"username": request.user.username,
-                                                "fixedExpenses": fixedExpenses,
+                                                "fixedExpenses": list(fixedExpenses),
                                                 "variableExpenses": variableExpenses})
 
 
@@ -34,7 +48,11 @@ def expenseDetails(request, expenseType, expenseId):
         Shows details of specific expense
     """
 
+    #Verify if user is Auth
+    checkIfAuth(request)
+
     #Gets the expense
+
     if expenseType == 'fixed':
         expense = models.FixedExpense.objects.all().filter(id=expenseId).first()
     elif expenseType == 'variable':
@@ -70,7 +88,8 @@ def expenseDetailsHandler(request):
     """
     Handle the expenseDetails POST, for editing expenses
     """
-    #ADD VERIFICATIONS HERE!!!!!!!!!!!!!!!!!!!!!
+    #Verify if user is auth
+    checkIfAuth(request)
 
 
     #Verifies if user wants to delete
@@ -122,6 +141,13 @@ def expenseDetailsHandler(request):
 
 
 def addExpense(request):
+    """"
+    fas
+    """
+    #Verify if user is auth
+    checkIfAuth(request)
+
+
     return render(request, "webapp/addExpense.html", {"username": request.user.username})
 
 

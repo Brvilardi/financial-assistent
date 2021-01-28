@@ -8,12 +8,21 @@
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js" integrity="sha512-d9xgZrVZpmmQlfonhQUvTR7lMPtO7NkZMkA0ABN3PHCbKA5nqylQ/yWlFAyY6hYgdF1Qh6nYiuADWwKB4C2WSw==" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="{% static 'webapp/home.css' %}">
+
+    <script>
+      var fixedExpensesRaw = "{{ fixedExpenses | safe  }}";
+      var variableExpensesRaw = "{{ variableExpenses | safe  }}";
+    
+    </script>
+
+    <script src="{% static 'webapp/home.js' %}"></script>
     <title>Home</title>
 </head>
 <body>
     
-
+<!-- Navbar -->
 <nav class="navbar navbar-expand-lg navbar-light" id="navbar">
     <a class="navbar-brand" href="/">Bruno's Finance</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -50,8 +59,26 @@
       </form>
     </div>
   </nav>
+<!-- end of navbar -->
 
-    <h1 id="title">Your's Expenses:</h1>
+<!-- graph -->
+
+<br><br>
+<h1 class="title">Your's Expenses Summary:</h1>
+<div id="graphContainer">
+  <canvas id="myChart"></canvas>
+</div>
+
+<br><br>
+
+
+
+
+
+
+
+<!-- expense list -->
+    <h1 class="title">Your's Expenses:</h1>
     <br><br>
     <div class="content">
       {% if fixedExpenses %}
@@ -61,13 +88,19 @@
                 </thead>
                 <tbody>
                     {% for expense in fixedExpenses %}
-                        <tr><td>{{ expense }}</td></tr>
+                        <tr>
+                          <td>
+                            <a href="/expense-details/fixed/{{ expense.id }}">
+                              <img src="{% static 'webapp/expand.svg' %}" alt="click to see details" class="expenseIcon">
+                            </a>
+                            {{ expense }}
+                          </td>
+                        </tr>
                     {% endfor %}
                 </tbody>
             </table>
             <br>
       {% endif %}
-
 
       {% if variableExpenses %}
           <table id="variableExpensesTable" class="table">
@@ -76,11 +109,20 @@
               </thead>
               <tbody>
                   {% for expense in variableExpenses %}
-                      <tr><td>{{ expense }}</td></tr>
+                    <tr>
+                      <td>
+                        <a href="/expense-details/variable/{{ expense.id }}">
+                          <img src="{% static 'webapp/expand.svg' %}" alt="click to see details" class="expenseIcon">
+                        </a>
+                        {{ expense }}
+                      </td>
+                    </tr>
                   {% endfor %}
               </tbody>
           </table>
       {% endif %}
     </div>
+<!-- end of expense list -->
+
 </body>
 </html>
