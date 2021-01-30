@@ -11,14 +11,6 @@ import json
 
 
 #Useful functions
-def checkIfAuth(request):
-    try:
-        if not request.user.is_authenticated:
-            #To do: return error message
-            print("User is not auth")
-            return redirect("home")
-    except Exception:
-        print(f"something went wrong\nuser: {request.user}")
 
 def jsonfy(target):
     newObject = target.__dict__
@@ -136,7 +128,14 @@ def registerHandler(request):
 
 def home(request):
     #Verify if user is auth
-    checkIfAuth(request)
+    try:
+        if not request.user.is_authenticated:
+            #To do: return error message
+            print("User is not auth")
+            return redirect("login")
+    except Exception:
+        print(f"something went wrong\nuser: {request.user}")
+        return redirect("login")
 
     #Gets all expenses of the user
     fixedExpenses = models.FixedExpense.objects.filter(owner=request.user)
@@ -169,7 +168,14 @@ def expenseDetails(request, expenseType, expenseId):
     """
 
     #Verify if user is Auth
-    checkIfAuth(request)
+    try:
+        if not request.user.is_authenticated:
+            #To do: return error message
+            print("User is not auth")
+            return redirect("login")
+    except Exception:
+        print(f"something went wrong\nuser: {request.user}")
+        return redirect("login")
 
     #Gets the expense
 
@@ -209,7 +215,14 @@ def expenseDetailsHandler(request):
     Handle the expenseDetails POST, for editing expenses
     """
     #Verify if user is auth
-    checkIfAuth(request)
+    try:
+        if not request.user.is_authenticated:
+            #To do: return error message
+            print("User is not auth")
+            return redirect("login")
+    except Exception:
+        print(f"something went wrong\nuser: {request.user}")
+        return redirect("login")
 
 
     #Verifies if user wants to delete
@@ -262,7 +275,14 @@ def addExpense(request):
     fas
     """
     #Verify if user is auth
-    checkIfAuth(request)
+    try:
+        if not request.user.is_authenticated:
+            #To do: return error message
+            print("User is not auth")
+            return redirect("login")
+    except Exception:
+        print(f"something went wrong\nuser: {request.user}")
+        return redirect("login")
 
 
     return render(request, "webapp/addExpense.html", {"username": request.user.username})
@@ -270,6 +290,17 @@ def addExpense(request):
 def addExpenseHandler(request):
     if request.method == 'GET':
         return HttpResponse("Method not allowed")
+
+    #Verifies if user is auth
+    try:
+        if not request.user.is_authenticated:
+            #To do: return error message
+            print("User is not auth")
+            return redirect("login")
+    except Exception:
+        print(f"something went wrong\nuser: {request.user}")
+        return redirect("login")
+
 
     #Loads form data
     form = request.POST
@@ -279,12 +310,10 @@ def addExpenseHandler(request):
     #Gets form date, or uses todays data
     expenseDate = date.today()
     try:
-        print("date: ", form['date'])
         expenseDate = datetime.strptime(form['date'], '%Y-%m-%d')
     except:
         #expense is today
         pass
-    print("expense date: ", expenseDate)
 
     #Verifies if user want to be warned and save the info with warnViaEmail and warnViaSMS
     try:
@@ -334,6 +363,16 @@ def monthDetails(request, monthIndex):
     """
     Gives details of expenses on a specific month
     """
+
+    #verifies if user is auth
+    try:
+        if not request.user.is_authenticated:
+            #To do: return error message
+            print("User is not auth")
+            return redirect("login")
+    except Exception:
+        print(f"something went wrong\nuser: {request.user}")
+        return redirect("login")
 
     # Loads clean expenses for that user
     fixedExpenses = cleanFixedExpenses(models.FixedExpense.objects.filter(owner=request.user))
