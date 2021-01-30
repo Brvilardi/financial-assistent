@@ -43,6 +43,7 @@ body {
   padding: 10px;
   text-align:center;
   width:fit-content;
+  border: 3px solid black;
   
 }
 
@@ -54,6 +55,14 @@ body {
 tr td{
   position: relative;
 }
+
+/* td {
+  border: 1px solid black;
+}
+
+th, thead {
+  border: 2px solid black;
+} */
 
 .expenseIcon{
   height: 11px;

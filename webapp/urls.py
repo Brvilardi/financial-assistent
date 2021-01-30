@@ -11,5 +11,6 @@ urlpatterns = [
     path("new-expense", views.addExpense, name="addExpense"),
     path("new-expense/post", views.addExpenseHandler, name="addExpenseHandler"),
     path("expense-details/<str:expenseType>/<int:expenseId>", views.expenseDetails, name="expenseDetails"),
-    path("expenseDetailsHandler", views.expenseDetailsHandler, name="expenseDetailsHandler")
+    path("expenseDetailsHandler", views.expenseDetailsHandler, name="expenseDetailsHandler"),
+    path("month/<int:monthIndex>", views.monthDetails, name="monthDetails")
 ]

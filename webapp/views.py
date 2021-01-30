@@ -22,7 +22,7 @@ def checkIfAuth(request):
 
 def jsonfy(target):
     newObject = target.__dict__
-    print("NEW: ", newObject)          
+    # print("NEW: ", newObject)          
     try:
         del newObject['_state']
     except Exception:
@@ -32,7 +32,7 @@ def jsonfy(target):
     except Exception:
         pass
     try:
-        del newObject['date']
+        newObject['date'] = str(newObject['date'])
     except Exception:
         pass
     
@@ -47,7 +47,7 @@ def cleanFixedExpenses(fixedExpenses):
     if today.day > 28:
         today = today.replace(day=28) #Fix problems with february (when replacing the date)
 
-    print("\n\ntoday1: ", today.replace(month=1))
+    # print("\n\ntoday1: ", today.replace(month=1))
     cleanFixedExpenses = {0:[],1:[],2:[],3:[],4:[],5:[],6:[],7:[],8:[],9:[],10:[],11:[]}
     for expense in fixedExpenses:
         #Checks if expense is forever
@@ -84,13 +84,13 @@ def cleanVariableExpenses(variableExpenses):
 
 # Create your views here.
 def index(request):
-    print("user: ", request.user.username)
+    # print("user: ", request.user.username)
     if request.user.is_authenticated:
         return redirect("home")
     return redirect("login")
 
 def register(request):
-    print("entrou")
+    # print("entrou")
     return render(request, "registration/register.html")
 
 def registerHandler(request):
@@ -146,13 +146,13 @@ def home(request):
     # print("Fixed1:")
     # print(fixedExpenses)
     cleanedFixedExpenses = cleanFixedExpenses(fixedExpenses.all())#The function is breaking the input, using .all() fixed
-    pprint.pprint(cleanedFixedExpenses)
+    # pprint.pprint(cleanedFixedExpenses)
     # print("Fixed2:")
     # print(fixedExpenses)
 
     #Cleans variableExpenses for easy front end ingestion
     cleanedVariableExpenses = cleanVariableExpenses(variableExpenses.all())#The function is breaking the input, using .all() fixed
-    pprint.pprint(cleanedVariableExpenses)
+    # pprint.pprint(cleanedVariableExpenses)
 
 
     
@@ -202,7 +202,7 @@ def expenseDetails(request, expenseType, expenseId):
                                                           'hiddenData': hiddenContent.items()})
 
 
-    print(content)
+    # print(content)
     
 def expenseDetailsHandler(request):
     """
@@ -280,18 +280,20 @@ def addExpenseHandler(request):
     try:
         warnViaEmail = form['warnViaEmail'] == 'on'
     except:
-        print("User doesnt want to me warned via email")
+        # print("User doesnt want to me warned via email")
+        pass
 
     try:
         warnViaSMS = form['warnViaSMS'] == 'on'
     except:
-        print("User doesnt want to me warned via SMS")
+        # print("User doesnt want to me warned via SMS")
+        pass
 
     
 
     if form["expenseType"] == "fixed":
         #Create FixedExpense object
-        print("duration: ", form["duration"])
+        # print("duration: ", form["duration"])
         expense = models.FixedExpense(title=form["title"], value=form["value"], paymentDay=form["paymentDay"], description=form["description"], owner=request.user, duration=int(form['duration']))
         expense.save()
 
@@ -304,7 +306,7 @@ def addExpenseHandler(request):
         if warnViaSMS:
             phoneNumberObj = models.UserPhoneNumber.objects.filter(user=request.user).first()
             eventObj.phoneNumber = phoneNumberObj.phoneNumber
-        print(eventObj)
+        # print(eventObj)
 
         eventObj.save()       
 
@@ -315,8 +317,21 @@ def addExpenseHandler(request):
     return render(request, "success.html", {'message': "Expense created!",
                                             'adicionalMessage': "home"})
 
+def monthDetails(request, monthIndex):
+    """
+    Gives details of expenses on a specific month
+    """
 
+    # Loads clean expenses for that user
+    fixedExpenses = cleanFixedExpenses(models.FixedExpense.objects.filter(owner=request.user))
+    variableExpenses = cleanVariableExpenses(models.VariableExpense.objects.filter(owner=request.user))
+    pprint.pprint(variableExpenses)
 
+    return render(request, 'webapp/monthDetails.html', {
+                                                        'fixedExpenses': fixedExpenses[monthIndex],
+                                                        'variableExpenses': variableExpenses[monthIndex]
+    })
+    
 
 
 
