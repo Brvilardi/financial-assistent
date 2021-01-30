@@ -81,7 +81,7 @@
   }
 
   function graphClickEvent(event, array){
-    console.log("event: ", event);
+    console.log("self: ", this);
     console.log("array: ", array)
 
     let url = "/month/" + String(array[0]._index)
@@ -135,7 +135,12 @@
                 stacked: true
               }]
             },
-            onClick: graphClickEvent
+            onClick: graphClickEvent,
+            hover: {
+              onHover: (event, chartElement) => {
+                event.target.style.cursor = chartElement[0] ? 'pointer' : 'default';
+              }     
+            }
       }
   });
   
