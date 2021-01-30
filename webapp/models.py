@@ -4,6 +4,9 @@ from django.db import models
 from django.contrib.auth.models import User
 from twilio.rest import Client
 from django.core.mail import send_mail
+from datetime import datetime
+
+defaultDate = datetime.strptime("01/01/20 13:55:26", '%m/%d/%y %H:%M:%S')
 
 # Create your models here.
 class FixedExpense(models.Model):
@@ -13,7 +16,7 @@ class FixedExpense(models.Model):
     description = models.TextField()
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
     duration = models.IntegerField(default=-1) #-1== forever
-    begining = models.DateField(auto_now_add=True, null=True)
+    begining = models.DateField(default=defaultDate)
       
 
     def __str__(self):
@@ -37,7 +40,7 @@ class VariableExpense(models.Model):
     value = models.FloatField()
     categorie = models.CharField(max_length=64)
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
-    date = models.DateField(auto_now_add=True, null=True)
+    date = models.DateField(default=defaultDate)
 
     def __str__(self):
         return f"{self.title} - {self.value} - {self.categorie} - {self.date} - {self.owner.username}"

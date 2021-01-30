@@ -3,7 +3,7 @@ import time
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from webapp import models
-from datetime import date
+from datetime import date, datetime
 from dateutil.relativedelta import *
 from django.contrib.auth.models import User
 import pprint
@@ -48,7 +48,7 @@ def cleanFixedExpenses(fixedExpenses):
         today = today.replace(day=28) #Fix problems with february (when replacing the date)
 
     # print("\n\ntoday1: ", today.replace(month=1))
-    cleanFixedExpenses = {0:[],1:[],2:[],3:[],4:[],5:[],6:[],7:[],8:[],9:[],10:[],11:[]}
+    cleanFixedExpenses = {1:[],2:[],3:[],4:[],5:[],6:[],7:[],8:[],9:[],10:[],11:[], 11:[]}
     for expense in fixedExpenses:
         #Checks if expense is forever
         month = expense.begining.month
@@ -276,6 +276,16 @@ def addExpenseHandler(request):
     warnViaEmail = False
     warnViaSMS = False
 
+    #Gets form date, or uses todays data
+    expenseDate = date.today()
+    try:
+        print("date: ", form['date'])
+        expenseDate = datetime.strptime(form['date'], '%Y-%m-%d')
+    except:
+        #expense is today
+        pass
+    print("expense date: ", expenseDate)
+
     #Verifies if user want to be warned and save the info with warnViaEmail and warnViaSMS
     try:
         warnViaEmail = form['warnViaEmail'] == 'on'
@@ -294,7 +304,10 @@ def addExpenseHandler(request):
     if form["expenseType"] == "fixed":
         #Create FixedExpense object
         # print("duration: ", form["duration"])
-        expense = models.FixedExpense(title=form["title"], value=form["value"], paymentDay=form["paymentDay"], description=form["description"], owner=request.user, duration=int(form['duration']))
+        expense = models.FixedExpense(title=form["title"], value=form["value"], 
+                                      paymentDay=form["paymentDay"], description=form["description"], 
+                                      owner=request.user, duration=int(form['duration']),
+                                      begining=expenseDate)
         expense.save()
 
         #Adds expense on alarms
@@ -311,7 +324,7 @@ def addExpenseHandler(request):
         eventObj.save()       
 
     elif form["expenseType"] == "variable":
-        expense = models.VariableExpense(title=form["title"], value=form["value"], categorie=form["categorie"], owner=request.user)
+        expense = models.VariableExpense(title=form["title"], value=form["value"], categorie=form["categorie"], owner=request.user, date=expenseDate)
         expense.save()
 
     return render(request, "success.html", {'message': "Expense created!",

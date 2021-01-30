@@ -29,6 +29,7 @@ let fixedForm = `
         <label for="warnViaSMS">Remember me via SMS: </label>
         <input type="checkbox" id="warnViaSMS" name="warnViaSMS" checked>
     </div>
+    <br><br>
 `;
 
 //categorie 
@@ -36,6 +37,7 @@ let variableForm = `
 
     <label for="categorie">Categorie: </label>
     <input name="categorie" type="text" placeholder="Your's expense Categorie">
+    <br><br>
 `
 
 var expenseForm = {
@@ -77,6 +79,18 @@ document.addEventListener('DOMContentLoaded', function() {
             checkboxIteration();  
 
         }
-    })
+    });
+
+    var today = document.getElementById("today");
+    today.onchange = function () {
+        let date = document.getElementById("date");
+        if (today.checked === true){
+            date.disabled = true;
+            date.value = null;
+        }
+        else{
+            date.disabled = false;
+        }
+    };
 
 })
