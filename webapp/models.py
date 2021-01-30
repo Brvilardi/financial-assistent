@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 from twilio.rest import Client
 from django.core.mail import send_mail
 from datetime import datetime
+import boto3
 
 defaultDate = datetime.strptime("01/01/20 13:55:26", '%m/%d/%y %H:%M:%S')
 
@@ -58,18 +59,19 @@ class NotificationEvents(models.Model):
     def sendSMS(self):
         try:
             if self.phoneNumber != None:
-                account_sid = os.environ['TWILIO_ACCOUNT_SID']
-                auth_token = os.environ['TWILIO_AUTH_TOKEN']
-                client = Client(account_sid, auth_token)
+                # Create an SNS client
+                client = boto3.client(
+                    "sns",
+                    'us-east-1'
+                )
 
-                message = client.messages.create(
-                                            body = f'{self.expense.owner.username}, today is payment day for "{self.expense.title}" on total value of {self.expense.value}',
-                                            from_ = os.environ['TWILIO_PHONE_NUMBER'],
-                                            to = self.phoneNumber
-                                        )
-                print(f"Sms {message.sid} to {self.expense.owner.username} is sent!")
-            else:
-                print("Event does not have a phoneNumber attached, skiping sendSMS...")
+                # Send your sms message.
+                client.publish(
+                    PhoneNumber=self.phoneNumber,
+                    Message=f'{self.expense.owner.username}, today is payment day for "{self.expense.title}" on total value of {self.expense.value}'
+                )
+                
+
         except Exception:
             print(f"somethin went wrong with SMS {self}")
 

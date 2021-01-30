@@ -42,11 +42,10 @@ def run():
 
     #Sends notifications for todays events:
     todayEvents = models.NotificationEvents.objects.all().filter(expense__paymentDay=curDay)
-    print("Events: ", todayEvents)
     count = 0
     if todayEvents:
         for event in todayEvents:
-            print(f"event: {event} // wasSent: {event.wasSent}")
+            # print(f"event: {event} // wasSent: {event.wasSent}")
             if not event.wasSent:
                 sendNotifications(event, True)
                 count +=1
