@@ -48,12 +48,12 @@ def cleanFixedExpenses(fixedExpenses):
         today = today.replace(day=28) #Fix problems with february (when replacing the date)
 
     # print("\n\ntoday1: ", today.replace(month=1))
-    cleanFixedExpenses = {1:[],2:[],3:[],4:[],5:[],6:[],7:[],8:[],9:[],10:[],11:[], 11:[]}
+    cleanFixedExpenses = {1:[],2:[],3:[],4:[],5:[],6:[],7:[],8:[],9:[],10:[],11:[], 12:[]}
     for expense in fixedExpenses:
         #Checks if expense is forever
-        month = expense.begining.month
+        month = expense.begining.month #January
         if expense.duration == -1:
-            while(month <= 11):
+            while(month <= 12):
                 cleanFixedExpenses[month].append(jsonfy(expense))
                 month += 1
 
@@ -61,7 +61,7 @@ def cleanFixedExpenses(fixedExpenses):
         elif expense.begining.year == today.year:
             month = expense.begining.month
             lastDate = expense.begining + relativedelta(months=+expense.duration)
-            while(month <= 11):
+            while(month <= 12):
                 #Checks if expend exceed the duration
                 if today.replace(month=month) >= lastDate:
                     break
@@ -74,7 +74,7 @@ def cleanVariableExpenses(variableExpenses):
     """
     Returns a dictionary with all variable expenses from 0 - Jan to 11 - Dec
     """
-    cleanVariableExpenses = {0:[],1:[],2:[],3:[],4:[],5:[],6:[],7:[],8:[],9:[],10:[],11:[]}
+    cleanVariableExpenses = {1:[],2:[],3:[],4:[],5:[],6:[],7:[],8:[],9:[],10:[],11:[], 11:[]}
     for expense in variableExpenses:
         cleanVariableExpenses[expense.date.month].append(jsonfy(expense))
     return cleanVariableExpenses
