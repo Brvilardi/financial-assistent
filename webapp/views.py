@@ -5,6 +5,7 @@ from django.http import HttpResponse
 from webapp import models
 from datetime import date
 from dateutil.relativedelta import *
+from django.contrib.auth.models import User
 import pprint
 import json
 
@@ -41,12 +42,17 @@ def cleanFixedExpenses(fixedExpenses):
     """"
     Returns a dictionary with all fixed expenses from 0 - Jan to 11 - Dec
     """
+    #Gets today date
     today = date.today()
+    if today.day > 28:
+        today = today.replace(day=28) #Fix problems with february (when replacing the date)
+
+    print("\n\ntoday1: ", today.replace(month=1))
     cleanFixedExpenses = {0:[],1:[],2:[],3:[],4:[],5:[],6:[],7:[],8:[],9:[],10:[],11:[]}
     for expense in fixedExpenses:
         #Checks if expense is forever
+        month = expense.begining.month
         if expense.duration == -1:
-            month = expense.begining.month
             while(month <= 11):
                 cleanFixedExpenses[month].append(jsonfy(expense))
                 month += 1
@@ -75,6 +81,7 @@ def cleanVariableExpenses(variableExpenses):
 
 #-------------------------------------------------------------
 
+
 # Create your views here.
 def index(request):
     print("user: ", request.user.username)
@@ -83,7 +90,49 @@ def index(request):
     return redirect("login")
 
 def register(request):
-    return HttpResponse("<h1>Registration not working yet :(</h1>")
+    print("entrou")
+    return render(request, "registration/register.html")
+
+def registerHandler(request):
+    #Loads form data (and verifies if all user name and password are correct)
+    data = {}
+
+    #Gets username
+    try:
+        data['username'] = request.POST['username']
+    except Exception:
+        return render(request, 'error.html', {'message': "Username not provided"})
+    #Gets password
+    try:
+        data['password'] = request.POST['password']
+    except Exception:
+        return render(request, 'error.html', {'message': "Username not provided"})
+    #Gets email or save email as None
+    try:
+        data['email'] = request.POST['email']
+    except Exception:
+        data['email']=None
+    #Gets phone number or save phoneNumber as None
+    try:
+        data['phoneNumber'] = request.POST['phoneNumber']
+    except Exception:
+        data['phoneNumber']=None
+        
+
+    #Checks if that user already exists:
+    query = User.objects.filter(username=data['username']).first()
+    if query != None:
+        return render(request, 'registration/register.html', {'message': f"Username {data['username']} already exists!"})
+    
+    #Creates user
+    newUser = User.objects.create_user( username=data['username'], password=data['password'], email=data['email'])
+    #Asign user to its phone number
+    newUserPhone = models.UserPhoneNumber(user=newUser, phoneNumber=data['phoneNumber'])
+    #Saves new User on db
+    newUser.save()
+    newUserPhone.save()
+
+    return  render(request, 'success.html', {'message': f"New user {newUser.username} was created!"})
 
 def home(request):
     #Verify if user is auth
@@ -94,12 +143,12 @@ def home(request):
     variableExpenses = models.VariableExpense.objects.filter(owner=request.user)  
 
     #Cleans fixedExpenses for not active expense
-    print("Fixed1:")
-    print(fixedExpenses)
+    # print("Fixed1:")
+    # print(fixedExpenses)
     cleanedFixedExpenses = cleanFixedExpenses(fixedExpenses.all())#The function is breaking the input, using .all() fixed
     pprint.pprint(cleanedFixedExpenses)
-    print("Fixed2:")
-    print(fixedExpenses)
+    # print("Fixed2:")
+    # print(fixedExpenses)
 
     #Cleans variableExpenses for easy front end ingestion
     cleanedVariableExpenses = cleanVariableExpenses(variableExpenses.all())#The function is breaking the input, using .all() fixed
@@ -113,7 +162,6 @@ def home(request):
                                                 "variableExpenses": variableExpenses,
                                                 "cleanedFixedExpenses": json.dumps(cleanedFixedExpenses),
                                                 "cleanedVariableExpenses": json.dumps(cleanedVariableExpenses)})
-
 
 def expenseDetails(request, expenseType, expenseId):
     """
@@ -174,15 +222,15 @@ def expenseDetailsHandler(request):
     expenseType = request.POST['expenseType']
     expenseId = request.POST['expenseId']
 
-    #Deletes object if user wants to
+    #Deletes object if user wants to:
     
-
     #Gets specific expense info and updates or deletes on db
     if expenseType == 'fixed':
         expense = models.FixedExpense.objects.filter(id=expenseId).first()
         if delete:
             expense.delete()
-            return HttpResponse(f"Deleted")
+            return render(request, "success.html", {'message': f"Expense {expense.title} deleted!",
+                                                                    'adicionalMessage': "home"})
 
         expense.title = request.POST['title']
         expense.value = request.POST['value']
@@ -209,9 +257,6 @@ def expenseDetailsHandler(request):
 
     return HttpResponse(f'Success!! "{expense.title}" updated!')
     
-
-
-
 def addExpense(request):
     """"
     fas
@@ -222,12 +267,27 @@ def addExpense(request):
 
     return render(request, "webapp/addExpense.html", {"username": request.user.username})
 
-
 def addExpenseHandler(request):
     if request.method == 'GET':
         return HttpResponse("Method not allowed")
 
+    #Loads form data
     form = request.POST
+    warnViaEmail = False
+    warnViaSMS = False
+
+    #Verifies if user want to be warned and save the info with warnViaEmail and warnViaSMS
+    try:
+        warnViaEmail = form['warnViaEmail'] == 'on'
+    except:
+        print("User doesnt want to me warned via email")
+
+    try:
+        warnViaSMS = form['warnViaSMS'] == 'on'
+    except:
+        print("User doesnt want to me warned via SMS")
+
+    
 
     if form["expenseType"] == "fixed":
         #Create FixedExpense object
@@ -236,14 +296,24 @@ def addExpenseHandler(request):
         expense.save()
 
         #Adds expense on alarms
-        eventObj = models.NotificationEvents(expense=expense, email=request.user.email)
+        eventObj = models.NotificationEvents(expense=expense)
+
+        #Verifies if user wants to be warned and save it on eventObj
+        if warnViaEmail:
+            eventObj.email = request.user.email
+        if warnViaSMS:
+            phoneNumberObj = models.UserPhoneNumber.objects.filter(user=request.user).first()
+            eventObj.phoneNumber = phoneNumberObj.phoneNumber
+        print(eventObj)
+
         eventObj.save()       
 
     elif form["expenseType"] == "variable":
         expense = models.VariableExpense(title=form["title"], value=form["value"], categorie=form["categorie"], owner=request.user)
         expense.save()
 
-    return HttpResponse("Expense created")
+    return render(request, "success.html", {'message': "Expense created!",
+                                            'adicionalMessage': "home"})
 
 
 

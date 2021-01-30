@@ -1,0 +1,32 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <link rel="shortcut icon" type="image/png" href="{% static 'favicon.ico' %}"/>
+
+    <title>Success</title>
+</head>
+<body>
+    <div class="alert alert-success" role="alert">
+  <h4 class="alert-heading">{% block title %}Success!!{% endblock %}</h4>
+  <p> 
+     {% block message1  %} {{ message }} {% endblock %}
+  </p>
+  <hr>
+  <p class="mb-0">{% block message2  %}{% endblock %}
+      {% if adicionalMessage %}
+
+        {% if adicionalMessage == 'home' %}
+            Click <a href="{% url 'home' %}">here</a> to return to homepage
+        {% endif %}
+
+         {{ adicionalMessage }} 
+      {% endif %}
+  </p>
+</div>
+</body>
+</html>

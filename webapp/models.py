@@ -50,34 +50,47 @@ class NotificationEvents(models.Model):
     wasSent = models.BooleanField(default=False, null = True)
 
     def __str__(self):
-        return f"SMS - to {self.phoneNumber} about {self.expense}"
+        return f"SMS - to {self.phoneNumber} and/or email to {self.email} about {self.expense}"
 
     def sendSMS(self):
-        if self.phoneNumber != None:
-            account_sid = os.environ['TWILIO_ACCOUNT_SID']
-            auth_token = os.environ['TWILIO_AUTH_TOKEN']
-            client = Client(account_sid, auth_token)
+        try:
+            if self.phoneNumber != None:
+                account_sid = os.environ['TWILIO_ACCOUNT_SID']
+                auth_token = os.environ['TWILIO_AUTH_TOKEN']
+                client = Client(account_sid, auth_token)
 
-            message = client.messages.create(
-                                        body = f'{self.expense.owner.username}, today is payment day for "{self.expense.title}" on total value of {self.expense.value}',
-                                        from_ = os.environ['TWILIO_PHONE_NUMBER'],
-                                        to = self.phoneNumber
-                                    )
-            print(f"Sms {message.sid} to {self.expense.owner.username} is sent!")
-        else:
-            print("Event does not have a phoneNumber attached, skiping sendSMS...")
+                message = client.messages.create(
+                                            body = f'{self.expense.owner.username}, today is payment day for "{self.expense.title}" on total value of {self.expense.value}',
+                                            from_ = os.environ['TWILIO_PHONE_NUMBER'],
+                                            to = self.phoneNumber
+                                        )
+                print(f"Sms {message.sid} to {self.expense.owner.username} is sent!")
+            else:
+                print("Event does not have a phoneNumber attached, skiping sendSMS...")
+        except Exception:
+            print(f"somethin went wrong with SMS {self}")
 
     def sendEMAIL(self):
-        if self.email != None:
-            send_mail(
-            f"Payment day for {self.expense.title}!", #subject
-            f'{self.expense.owner.username}, today is payment day for "{self.expense.title}" on total value of {self.expense.value}', #body
-            'brunovilardibueno@gmail.com', #from
-            [self.email], #to
-            fail_silently=False,
-            )
-            print(f"email to {self.expense.owner.username} is sent!")
-        else:
-            print("Event does not have a email attached, skiping sendEMAIL...")
+        try:
+            if self.email != None:
+                send_mail(
+                f"Payment day for {self.expense.title}!", #subject
+                f'{self.expense.owner.username}, today is payment day for "{self.expense.title}" on total value of {self.expense.value}', #body
+                'brunovilardibueno@gmail.com', #from
+                [self.email], #to
+                fail_silently=False,
+                )
+                print(f"email to {self.expense.owner.username} is sent!")
+            else:
+                print("Event does not have a email attached, skiping sendEMAIL...")
+        except Exception:
+            print(f"somethin went wrong with email {self}")
 
+#----------------------------------------------------------------
 
+class UserPhoneNumber(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    phoneNumber = models.CharField(max_length=64, blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.phoneNumber}"

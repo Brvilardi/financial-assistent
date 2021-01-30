@@ -16,7 +16,19 @@ let fixedForm = `
     <input type="number" id="duration" name="duration" min="1">
 
     <input type="checkbox" id="durationForever" name="duration" value="-1">
-    <label for="duration"> Forever</label><br>
+    <label for="duration"> Forever</label>
+    
+    <br><br>
+    
+    <div>
+        <label for="warnViaEmail">Remember me via email: </label>
+        <input type="checkbox" id="warnViaEmail" name="warnViaEmail" checked>
+    </div>
+
+    <div>
+        <label for="warnViaSMS">Remember me via SMS: </label>
+        <input type="checkbox" id="warnViaSMS" name="warnViaSMS" checked>
+    </div>
 `;
 
 //categorie 

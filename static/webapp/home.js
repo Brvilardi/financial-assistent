@@ -40,6 +40,16 @@ function getMonthlyExpense(fixed, variable){
 
 
 
+
+function graphClickEvent(event, array){
+    console.log("teste");
+    console.log("event: ", event);
+    console.log("array", array);
+
+}
+
+
+
 document.addEventListener("DOMContentLoaded", function(){
 
     var fixedExpenses = cleanData(fixedExpensesRaw.split(","));
@@ -89,7 +99,8 @@ document.addEventListener("DOMContentLoaded", function(){
                 yAxes: [{
                   stacked: true
                 }]
-              }
+              },
+            onClick: graphClickEvent
         }
     });
     

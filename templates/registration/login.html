@@ -5,9 +5,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
     <link rel="stylesheet" href="{% static 'webapp/home.css' %}">
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <link rel="shortcut icon" type="image/png" href="{% static 'favicon.ico' %}"/>
     <script src="{% static 'webapp/login.js' %}"></script>
 
     <title>Login</title>
@@ -21,12 +24,14 @@
             <div class="container">
                 <div id="login-row" class="row justify-content-center align-items-center">
                     <div id="login-column" class="col-md-6">
-                        <div id="login-box" class="col-md-12">
+                        <div id="login-box" class="col-md-12" style="height:fit-content">
                             <form id="login-form" class="form" action="" method="post">
                                {% csrf_token %}
                                 <h3 class="text-center text-info">Login</h3>
                                 {% if form.errors %}
-                                <p>Your username and password didn't match. Please try again.</p>
+                                <div class="form-group alert alert-danger" role="alert">
+                                    <p>Your username and password didn't match. Please try again.</p>
+                                </div>
                                 {% endif %}
                                 <div class="form-group">
                                     <label for="username" class="text-info">Username:</label><br>
@@ -34,24 +39,19 @@
                                 </div>
                                 <div class="form-group">
                                     <label for="password" class="text-info">Password:</label><br>
-                                    <div style="flex-wrap: wrap;">
-                                    <input type="password" name="password" id="password" class="form-control">
-                                    <img id="lock" src="{% static 'webapp/eyeOpen.svg' %}" alt="Eye" width=24px data-status="closed" style="cursor: pointer;" >
-                                    
+                                    <div style="position: relative;">
+                                        <input type="password" name="password" id="password" class="form-control" style="">
+                                        <img id="lock" src="{% static 'webapp/eyeOpen.svg' %}" alt="Eye" width=24px data-status="closed" style="position: absolute; right: 5px; bottom: 5px; cursor: pointer;" >
                                     </div>
                                 </div>
-                                <div class="form-group">
-                                    <br>
-                                    <!-- <label for="remember-me" class="text-info"><span>Remember me</span> <span><input id="remember-me" name="remember-me" type="checkbox"></span></label><br> -->
-                                    <input type="submit" name="submit" class="btn btn-info btn-md" value="submit">
-                                </div>
-                                <div id="links"></div>
-                                <div id="password-reset" class="text-left">
-                                    <!-- <a href="{% url 'password_reset' %}" class="text-info">Lost password?</a> -->
-                                </div>
-                                <div id="register-link" class="text-right">
-                                    <a href="{% url 'password_reset' %}" class="text-info">Lost password?</a> or
-                                    <a href="{% url 'register' %}" class="text-info">Register here</a>
+                                <br> 
+                                <div class="form-group" style="height: fit-content;">
+                                        <div class="text-right" style="display: inline-block; vertical-align: middle;">
+                                            <a href="{% url 'password_reset' %}" class="text-right">Lost password?</a> or
+                                            <a href="{% url 'register' %}" class="text-right">Register here</a>
+                                        </div>
+                                        <input type="submit" name="submit" class="btn btn-info btn-md" value="submit" style="display: inline-block; float: right; vertical-align: middle;">
+                                    </div>
                                 </div>
                                 
                             </form>

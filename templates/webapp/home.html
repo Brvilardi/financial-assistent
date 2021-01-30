@@ -80,56 +80,65 @@
     return newArray;
   }
 
-    var fixedExpenses = {{ cleanedFixedExpenses | safe }};
-    var variableExpenses = {{ cleanedVariableExpenses| safe }};
+  function graphClickEvent(event, array){
+    // console.log("event: ", event);
+    console.log("index: ", array[0]._index)
 
-    var cleanedFixedExpenses = mapSum(Object.values(fixedExpenses));
-    var cleanedVariableExpenses = mapSum(Object.values(variableExpenses))
+  }
 
 
-    var ctx = document.getElementById('myChart').getContext('2d');
-    var chart = new Chart(ctx, {
-        // The type of chart we want to create
-        type: 'bar',
-    
-        // The data for our dataset
-        data: {
-            labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
-            datasets: [{
-                label: 'Fixed Expense',
-                backgroundColor: 'rgb(255, 99, 132)',
-                borderColor: 'rgb(255, 255, 255)',
-                data: cleanedFixedExpenses
+
+  var fixedExpenses = {{ cleanedFixedExpenses | safe }};
+  var variableExpenses = {{ cleanedVariableExpenses| safe }};
+
+  var cleanedFixedExpenses = mapSum(Object.values(fixedExpenses));
+  var cleanedVariableExpenses = mapSum(Object.values(variableExpenses))
+
+
+  var ctx = document.getElementById('myChart').getContext('2d');
+  var chart = new Chart(ctx, {
+      // The type of chart we want to create
+      type: 'bar',
+  
+      // The data for our dataset
+      data: {
+          labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+          datasets: [{
+              label: 'Fixed Expense',
+              backgroundColor: 'rgb(255, 99, 132)',
+              borderColor: 'rgb(255, 255, 255)',
+              data: cleanedFixedExpenses
+          },
+          {
+              label: 'Variable Expense',
+              backgroundColor: 'rgb(13, 109, 52)',
+              borderColor: 'rgb(255, 255, 255)',
+              data: cleanedVariableExpenses
+          }
+          
+
+      ]
+      },
+  
+      // Configuration options go here
+      options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+              xAxes: [{
+                stacked: true,
+              }],
+              yAxes: [{
+                stacked: true
+              }]
             },
-            {
-                label: 'Variable Expense',
-                backgroundColor: 'rgb(13, 109, 52)',
-                borderColor: 'rgb(255, 255, 255)',
-                data: cleanedVariableExpenses
-            }
-            
-
-        ]
-        },
-    
-        // Configuration options go here
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                xAxes: [{
-                  stacked: true,
-                }],
-                yAxes: [{
-                  stacked: true
-                }]
-              }
-        }
-    });
-    
-    chart.canvas.style.backgroundColor = 'rgba(255,255,255)';
-    
-    
+            onClick: graphClickEvent
+      }
+  });
+  
+  chart.canvas.style.backgroundColor = 'rgba(255,255,255)';
+  
+  
 
 </script>
 <br><br>

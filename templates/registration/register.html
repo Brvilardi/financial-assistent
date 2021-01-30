@@ -1,0 +1,45 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'registration/register.css' %}">
+    <title>Document</title>
+</head>
+<body>
+    <div id="login-box">
+        <div class="left">
+            <h1>Sign up</h1>
+            <form action="{% url 'registerHandler' %}" method="post">
+                {% csrf_token %}
+                <input type="text" name="username" placeholder="Username"/>
+                <input type="password" name="password" placeholder="Password"/>
+                <input type="password" name="password2" placeholder="Retype password"/>
+                <input type="text" name="email" placeholder="E-mail (optional)"/>
+                <input type="text" name="phoneNumber" placeholder="Phone number (optional)"/>
+                
+                <input type="submit" name="signup_submit"/>
+            </form>
+        </div>
+        
+        
+        <div class="right">
+          <span class="loginwith" style="color:red;" >
+            {% if message %}
+                {{ message }}
+            {% else %}
+                <br>
+            {% endif %}
+            
+        </span>
+          
+          <button class="social-signin facebook">Log in with facebook</button>
+          <button class="social-signin twitter">Log in with Twitter</button>
+          <button class="social-signin google">Log in with Google+</button>
+        </div>
+        <div class="or">OR</div>
+      </div>
+    
+</body>
+</html>

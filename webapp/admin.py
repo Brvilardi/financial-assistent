@@ -7,3 +7,4 @@ from webapp import models
 admin.site.register(models.FixedExpense)
 admin.site.register(models.VariableExpense)
 admin.site.register(models.NotificationEvents)
+admin.site.register(models.UserPhoneNumber)
