@@ -12,18 +12,24 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 
 import os
 from django.urls import reverse
+import customScripts
 # from webapp import models
 
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+#Credentials path
+CREDENTIALS_PATH = "/home/ubuntu/credentials.csv"
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY')
+try: 
+    SECRET_KEY = os.environ['SECRET_KEY']
+except:
+    SECRET_KEY = customScripts.getVariableData(CREDENTIALS_PATH, "SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -140,10 +146,23 @@ LOGIN_REDIRECT_URL = "/home"
 #EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 #Email config
-EMAIL_HOST = os.environ.get('EMAIL_HOST')
+try:
+    EMAIL_HOST = os.environ['EMAIL_HOST']
+except:
+    EMAIL_HOST = customScripts.getVariableData(CREDENTIALS_PATH, "EMAIL_HOST")
+
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
+
+try:
+    EMAIL_HOST_USER = os.environ['EMAIL_HOST_USER']
+except:
+    EMAIL_HOST_USER = customScripts.getVariableData(CREDENTIALS_PATH, "EMAIL_HOST_USER")
+
+try: 
+    EMAIL_HOST_PASSWORD = os.environ['EMAIL_HOST_PASSWORD']
+except:
+    EMAIL_HOST_PASSWORD = customScripts.getVariableData(CREDENTIALS_PATH, "EMAIL_HOST_PASSWORD")
+
 
 

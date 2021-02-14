@@ -1,3 +1,5 @@
 venv/
 db.sqlite3
 todo
+__pycache__/
+planejamentoFinanceiro/__pycache__
