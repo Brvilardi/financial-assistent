@@ -3,3 +3,5 @@ db.sqlite3
 todo
 __pycache__/
 planejamentoFinanceiro/__pycache__
+planejamentoFinanceiro/__pycache__/__init__.cpython-38.pyc
+webapp/__pycache__/
