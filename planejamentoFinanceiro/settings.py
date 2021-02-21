@@ -26,10 +26,7 @@ CREDENTIALS_PATH = "/home/ubuntu/enviromentVariables.csv"
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-try: 
-    SECRET_KEY = os.environ['SECRET_KEY']
-except:
-    SECRET_KEY = customScripts.getVariableData(CREDENTIALS_PATH, "SECRET_KEY")
+SECRET_KEY = customScripts.getVariableData(CREDENTIALS_PATH, "SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -48,6 +45,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'django_extensions',
+    'storages',
 
     
     'webapp'
@@ -146,23 +144,25 @@ LOGIN_REDIRECT_URL = "/home"
 #EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 #Email config
-try:
-    EMAIL_HOST = os.environ['EMAIL_HOST']
-except:
-    EMAIL_HOST = customScripts.getVariableData(CREDENTIALS_PATH, "EMAIL_HOST")
-
+EMAIL_HOST = customScripts.getVariableData(CREDENTIALS_PATH, "EMAIL_HOST")
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-
-try:
-    EMAIL_HOST_USER = os.environ['EMAIL_HOST_USER']
-except:
-    EMAIL_HOST_USER = customScripts.getVariableData(CREDENTIALS_PATH, "EMAIL_HOST_USER")
-
-try: 
-    EMAIL_HOST_PASSWORD = os.environ['EMAIL_HOST_PASSWORD']
-except:
-    EMAIL_HOST_PASSWORD = customScripts.getVariableData(CREDENTIALS_PATH, "EMAIL_HOST_PASSWORD")
+EMAIL_HOST_USER = customScripts.getVariableData(CREDENTIALS_PATH, "EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = customScripts.getVariableData(CREDENTIALS_PATH, "EMAIL_HOST_PASSWORD")
 
 
+#AWS static
+AWS_STORAGE_BUCKET_NAME = customScripts.getVariableData(CREDENTIALS_PATH, "AWS_STORAGE_BUCKET_NAME")
+AWS_S3_REGION_NAME = customScripts.getVariableData(CREDENTIALS_PATH, "AWS_S3_REGION_NAME")  # e.g. us-east-2
+AWS_ACCESS_KEY_ID = customScripts.getVariableData(CREDENTIALS_PATH, "AWS_ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY = customScripts.getVariableData(CREDENTIALS_PATH, "AWS_SECRET_ACCESS_KEY")
+
+
+
+# Tell django-storages the domain to use to refer to static files.
+AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
+
+# Tell the staticfiles app to use S3Boto3 storage when writing the collected static files (when
+# you run `collectstatic`).
+STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
