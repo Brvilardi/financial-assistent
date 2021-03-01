@@ -98,7 +98,7 @@ def registerHandler(request):
     try:
         data['password'] = request.POST['password']
     except Exception:
-        return render(request, 'error.html', {'message': "Username not provided"})
+        return render(request, 'error.html', {'message': "Password not provided"})
     #Gets email or save email as None
     try:
         data['email'] = request.POST['email']
